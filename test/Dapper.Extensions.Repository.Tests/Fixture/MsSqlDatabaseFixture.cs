@@ -9,8 +9,7 @@ namespace Dapper.Extensions.Repository.Tests.Fixture
     {
         public MsSqlDatabaseFixture()
         {
-            var connString = "server=192.168.0.117;database=Dapper.Extensions.Repository;uid=sa;pwd=Ls1;";
-            //var connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dapper.Repository;Integrated Security=True;";
+            var connString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dapper.Extensions.Repository;Integrated Security=True;";
 
             Db = new DbContext(new SqlConnection(connString), new DebugLogger("TestLogger"));
 
@@ -25,6 +24,7 @@ namespace Dapper.Extensions.Repository.Tests.Fixture
             dropTable("Users");
             dropTable("Cars");
             dropTable("CarOptions");
+            dropTable("CarOptionImages");
             dropTable("Roles");
             dropTable("Images");
             dropTable("Dishes");
@@ -38,6 +38,7 @@ namespace Dapper.Extensions.Repository.Tests.Fixture
             Db.Connection.Execute(@"CREATE TABLE Users (Id int IDENTITY(1,1) not null, Name varchar(50) not null, Deleted bit not null, PRIMARY KEY (Id))");
             Db.Connection.Execute(@"CREATE TABLE Cars (Id int IDENTITY(1,1) not null, CarName varchar(50) not null, UserId int, PRIMARY KEY (Id))");
             Db.Connection.Execute(@"CREATE TABLE CarOptions (Id int IDENTITY(1,1) not null, OptionName varchar(50) not null, CarId int, PRIMARY KEY (Id))");
+            Db.Connection.Execute(@"CREATE TABLE CarOptionImages (Id int IDENTITY(1,1) not null, Name varchar(50) not null, CarOptionId int, PRIMARY KEY (Id))");
             Db.Connection.Execute(@"CREATE TABLE Roles (Id int IDENTITY(1,1) not null, Name varchar(50) not null, UserId int, PRIMARY KEY (Id))");
             Db.Connection.Execute(@"CREATE TABLE Images (Id int IDENTITY(1,1) not null, Name varchar(50) not null, UserId int, PRIMARY KEY (Id))");
             Db.Connection.Execute(@"CREATE TABLE Dishes (DishId int IDENTITY(1,1) not null, Name varchar(50) not null, PRIMARY KEY (DishId))");
@@ -58,6 +59,8 @@ namespace Dapper.Extensions.Repository.Tests.Fixture
             Db.Connection.Execute($"INSERT INTO [dbo].[Cars]([CarName],[UserId])VALUES('Car2', 1)");
             Db.Connection.Execute($"INSERT INTO [dbo].[CarOptions]([OptionName],[CarId])VALUES('Option1', 1)");
             Db.Connection.Execute($"INSERT INTO [dbo].[CarOptions]([OptionName],[CarId])VALUES('Option2', 2)");
+            Db.Connection.Execute($"INSERT INTO [dbo].[CarOptions]([OptionName],[CarId])VALUES('Option3', 2)");
+            Db.Connection.Execute($"INSERT INTO [dbo].[CarOptionImages]([Name],[CarOptionId])VALUES('Image3', 3)");
             Db.Connection.Execute($"INSERT INTO [dbo].[Roles]([Name],[UserId])VALUES('Role1', 1)");
             Db.Connection.Execute($"INSERT INTO [dbo].[Roles]([Name],[UserId])VALUES('Role2', 1)");
             Db.Connection.Execute($"INSERT INTO [dbo].[Roles]([Name],[UserId])VALUES('Role3', 1)");

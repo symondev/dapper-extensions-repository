@@ -177,14 +177,19 @@ namespace Dapper.Extensions.Repository.Tests
             Assert.Null(users[1].Image);
             Assert.NotNull(users[2].Image);
             Assert.Equal("Image4", users[2].Image.Name);
+        }
 
-            sql = @"SELECT * FROM Users
+        [Fact]
+        public async Task TestFindMultipleMappingAsync1()
+        {
+            var sql = @"SELECT * FROM Users
                     LEFT JOIN Cars ON Users.Id = Cars.UserId
                     LEFT JOIN CarOptions ON Cars.Id = CarOptions.CarId
                     LEFT JOIN Images On Users.Id = Images.UserId
+                    LEFT JOIN CarOptionImages ON CarOptions.Id = CarOptionImages.CarOptionId
                     WHERE Users.Deleted != 1";
 
-            users = (await _fixture.Db.SetEntity<User>().FindAllAsync<Car, CarOption, Image>(sql)).ToList();
+            var users = (await _fixture.Db.SetEntity<User>().FindAllAsync<Car, CarOption, Image, CarOptionImage>(sql)).ToList();
             Assert.Equal(3, users.Count);
             Assert.Equal(2, users[0].Cars.Count);
             Assert.Equal("Car1", users[0].Cars[0].CarName);
@@ -194,6 +199,12 @@ namespace Dapper.Extensions.Repository.Tests
             Assert.Null(users[1].Image);
             Assert.NotNull(users[2].Image);
             Assert.Equal("Image4", users[2].Image.Name);
+            Assert.Equal(1, users[0].Cars[0].Options.Count);
+            Assert.Equal(2, users[0].Cars[1].Options.Count);
+            Assert.Equal("Option3", users[0].Cars[1].Options[1].OptionName);
+            Assert.Null(users[0].Cars[0].Options[0].Image);
+            Assert.Null(users[0].Cars[1].Options[0].Image);
+            Assert.NotNull(users[0].Cars[1].Options[1].Image);
         }
 
         #endregion

@@ -8,5 +8,7 @@ namespace Dapper.Extensions.Repository.Tests.Entities
         public int CarId { get; set; }
 
         public string OptionName { get; set; }
+
+        public CarOptionImage Image { get; set; }
     }
 }

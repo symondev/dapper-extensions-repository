@@ -79,7 +79,7 @@ namespace Dapper.Extensions.Repository
             var queryResult = SqlGenerator.GetSelectAll(predicate);
             return Connection.Query<TEntity>(queryResult.Sql, queryResult.Param, transaction);
         }
-        
+
         /// <summary>
         ///
         /// </summary>
@@ -160,7 +160,7 @@ namespace Dapper.Extensions.Repository
             addChildType(typeof(TChild4));
             addChildType(typeof(TChild5));
             addChildType(typeof(TChild6));
-            
+
             // Set spilt on
             var spiltOn = "Id";
             //var keyFieldNames = entityTypes.Select(p => string.IsNullOrEmpty(p.KeyProperty.Alias) ? p.KeyProperty.Name : p.KeyProperty.Alias).ToList();
@@ -217,6 +217,7 @@ namespace Dapper.Extensions.Repository
                 lookup.Add(key, target = entity);
             }
 
+            var tagretChilds = new List<object>();
             for (var i = 0; i < childs.Length; i++)
             {
                 var child = childs[i];
@@ -247,7 +248,7 @@ namespace Dapper.Extensions.Repository
                 }
                 else
                 {
-                    for (var j=0;j<childTypeMetadatas.Count;j++)
+                    for (var j = 0; j < childTypeMetadatas.Count; j++)
                     {
                         parentPropertyType =
                             childTypeMetadatas[j].ChildProperties.SingleOrDefault(
@@ -283,28 +284,7 @@ namespace Dapper.Extensions.Repository
                 }
                 else
                 {
-                    var tmp = target;
-                    foreach (var m in childTypeMetadatas)
-                    {
-                        if (m.ChildProperties.Any(p => p.PropertyType == childTypeMetadata.Type) ||
-                            m.ChildProperties.Any(
-                                p =>
-                                    p.PropertyType.IsGenericType() &&
-                                    p.PropertyType.GenericTypeArguments.Any(x => x == childTypeMetadata.Type)))
-                        {
-
-                        }
-                    }
-                 //   var tmpParentEntity = childs[parentIndex];
-                    
-                    //for (var j = 0; j < childs.Length; j++)
-                    //{
-                    //    if (childEntityTypes[j].Type == parentEntityType.Type)
-                    //    {
-                    //        parentEntity = childs[j];
-                    //        break;
-                    //    }
-                    //}
+                    parentEntity = tagretChilds[parentIndex];
                 }
 
                 #endregion
@@ -339,22 +319,27 @@ namespace Dapper.Extensions.Repository
                                 throw new NotSupportedException();
                         }
 
-                        parentPropertyType.SetValue(target, list);
+                        parentPropertyType.SetValue(parentEntity, list);
                     }
 
                     var childKey = childTypeMetadata.KeyProperty.GetValue(child);
-                    var exist = (from object item in list select childTypeMetadata.KeyProperty.GetValue(item)).Contains(childKey);
-                    if (!exist)
+                    var value = (from object item in list where childTypeMetadata.KeyProperty.GetValue(item).Equals(childKey) select item).SingleOrDefault();
+                    if (value == null)
                     {
-                        list.Add(child);
+                        list.Add(value = child);
                     }
+
+                    tagretChilds.Add(value);
                 }
                 else
                 {
-                    if (parentPropertyType.GetValue(parentEntity) == null)
+                    var value = parentPropertyType.GetValue(parentEntity);
+                    if (value == null)
                     {
-                        parentPropertyType.SetValue(parentEntity, child);
+                        parentPropertyType.SetValue(parentEntity, value = child);
                     }
+
+                    tagretChilds.Add(value);
                 }
             }
 
