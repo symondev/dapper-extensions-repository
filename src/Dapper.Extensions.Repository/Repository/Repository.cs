@@ -94,9 +94,113 @@ namespace Dapper.Extensions.Repository
 
         #region Find Multiple Mapping
 
-        public virtual Task<IEnumerable<TEntity>> FindAllAsync<TChild1>(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
+        public IEnumerable<TEntity> FindAll<TChild1>(
+           string sql,
+           object param,
+           IDbTransaction transaction)
         {
-            return null;
+            return FindAll<TChild1, DontMap, DontMap, DontMap, DontMap, DontMap>(sql, param, transaction);
+        }
+
+        public IEnumerable<TEntity> FindAll<TChild1, TChild2>(
+           string sql,
+           object param,
+           IDbTransaction transaction)
+        {
+            return FindAll<TChild1, TChild2, DontMap, DontMap, DontMap, DontMap>(sql, param, transaction);
+        }
+
+        public IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3>(
+           string sql,
+           object param,
+           IDbTransaction transaction)
+        {
+            return FindAll<TChild1, TChild2, TChild3, DontMap, DontMap, DontMap>(sql, param, transaction);
+        }
+
+        public IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4>(
+            string sql,
+            object param,
+            IDbTransaction transaction)
+        {
+            return FindAll<TChild1, TChild2, TChild3, TChild4, DontMap, DontMap>(sql, param, transaction);
+        }
+
+        public IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(
+            string sql,
+            object param,
+            IDbTransaction transaction)
+        {
+            return FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, DontMap>(sql, param, transaction);
+        }
+
+        public IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
+            string sql,
+            object param,
+            IDbTransaction transaction)
+        {
+            // Set entity types
+            var entityTypes = new List<TypeMetadata>
+            {
+                new TypeMetadata(typeof(TEntity)),
+            };
+            var dontMapType = typeof(DontMap);
+            Action<Type> addChildType = type =>
+            {
+                if (type != dontMapType) entityTypes.Add(new TypeMetadata(type, false));
+            };
+            addChildType(typeof(TChild1));
+            addChildType(typeof(TChild2));
+            addChildType(typeof(TChild3));
+            addChildType(typeof(TChild4));
+            addChildType(typeof(TChild5));
+            addChildType(typeof(TChild6));
+
+            // Set spilt on
+            var spiltOn = "Id";
+            var keyFieldNames = entityTypes.Select(p => string.IsNullOrEmpty(p.KeyPropertyMetadata.Alias) ? p.KeyProperty.Name : p.KeyPropertyMetadata.Alias).ToList();
+            if (keyFieldNames.Any(p => p != "Id"))
+            {
+                spiltOn = string.Join(",", keyFieldNames);
+            }
+
+            Logger.LogSql(sql);
+
+            var lookup = new Dictionary<object, TEntity>();
+            bool buffered = true;
+            var rootTypeMetadata = entityTypes.Single(p => p.IsRoot);
+            var childTypeMetadatas = entityTypes.Where(p => !p.IsRoot).ToList();
+            var childEntityCount = childTypeMetadatas.Count;
+            if (childEntityCount == 1)
+            {
+                Connection.Query<TEntity, TChild1, TEntity>(sql, (entity, child1) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1), param, transaction, buffered, spiltOn);
+            }
+            else if (childEntityCount == 2)
+            {
+                Connection.Query<TEntity, TChild1, TChild2, TEntity>(sql, (entity, child1, child2) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1, child2), param, transaction, buffered, spiltOn);
+            }
+            else if (childEntityCount == 3)
+            {
+                Connection.Query<TEntity, TChild1, TChild2, TChild3, TEntity>(sql, (entity, child1, child2, child3) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1, child2, child3), param, transaction, buffered, spiltOn);
+            }
+            else if (childEntityCount == 4)
+            {
+                Connection.Query<TEntity, TChild1, TChild2, TChild3, TChild4, TEntity>(sql, (entity, child1, child2, child3, child4) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1, child2, child3, child4), param, transaction, buffered, spiltOn);
+            }
+            else if (childEntityCount == 5)
+            {
+                Connection.Query<TEntity, TChild1, TChild2, TChild3, TChild4, TChild5, TEntity>(sql, (entity, child1, child2, child3, child4, child5) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1, child2, child3, child4, child5), param, transaction, buffered, spiltOn);
+            }
+            else if (childEntityCount == 6)
+            {
+                Connection.Query<TEntity, TChild1, TChild2, TChild3, TChild4, TChild5, TChild6, TEntity>(sql, (entity, child1, child2, child3, child4, child5, child6) => EntityMapping<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(lookup, rootTypeMetadata, childTypeMetadatas, entity, child1, child2, child3, child4, child5, child6), param, transaction, buffered, spiltOn);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
+            return lookup.Values;
         }
 
         public async Task<IEnumerable<TEntity>> FindAllAsync<TChild1>(
@@ -163,15 +267,16 @@ namespace Dapper.Extensions.Repository
 
             // Set spilt on
             var spiltOn = "Id";
-            //var keyFieldNames = entityTypes.Select(p => string.IsNullOrEmpty(p.KeyProperty.Alias) ? p.KeyProperty.Name : p.KeyProperty.Alias).ToList();
-            //if (keyFieldNames.Any(p => p != "Id"))
-            //{
-            //    spiltOn = string.Join(",", keyFieldNames);
-            //}
+            var keyFieldNames = entityTypes.Select(p => string.IsNullOrEmpty(p.KeyPropertyMetadata.Alias) ? p.KeyProperty.Name : p.KeyPropertyMetadata.Alias).ToList();
+            if (keyFieldNames.Any(p => p != "Id"))
+            {
+                spiltOn = string.Join(",", keyFieldNames);
+            }
+
+            Logger.LogSql(sql);
 
             var lookup = new Dictionary<object, TEntity>();
             bool buffered = true;
-
             var rootTypeMetadata = entityTypes.Single(p => p.IsRoot);
             var childTypeMetadatas = entityTypes.Where(p => !p.IsRoot).ToList();
             var childEntityCount = childTypeMetadatas.Count;
@@ -536,6 +641,7 @@ namespace Dapper.Extensions.Repository
                     throw new Exception("Support only one key in a table");
                 }
                 KeyProperty = keyProperties.First();
+                KeyPropertyMetadata = new SqlPropertyMetadata(KeyProperty);
 
                 // Filter child properties
                 ChildProperties = allProperties.Where(ExpressionHelper.GetChildPropertiesPredicate()).ToArray();
@@ -544,6 +650,8 @@ namespace Dapper.Extensions.Repository
             public Type Type { get; }
 
             public PropertyInfo KeyProperty { get; }
+
+            public SqlPropertyMetadata KeyPropertyMetadata { get; }
 
             public PropertyInfo[] ChildProperties { get; }
 

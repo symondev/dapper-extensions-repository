@@ -20,12 +20,12 @@ namespace Dapper.Extensions.Repository.Tests
         [Fact]
         public async Task TestInsertAsync()
         {
-            var insertRecord1 = new RecordsForInsertAsync {Name = "1"};
+            var insertRecord1 = new RecordsForInsertAsync { Name = "1" };
             var result = await _fixture.Db.SetEntity<RecordsForInsertAsync>().InsertAsync(insertRecord1);
             Assert.True(result);
             Assert.True(insertRecord1.Id == 1);
 
-            var insertRecord2 = new RecordsForInsertAsync {Name = "2"};
+            var insertRecord2 = new RecordsForInsertAsync { Name = "2" };
             result = await _fixture.Db.SetEntity<RecordsForInsertAsync>().InsertAsync(insertRecord2);
             Assert.True(result);
             Assert.True(insertRecord2.Id == 2);
@@ -34,12 +34,12 @@ namespace Dapper.Extensions.Repository.Tests
         [Fact]
         public void TestInsert()
         {
-            var insertRecord1 = new RecordsForInsert {Name = "1"};
+            var insertRecord1 = new RecordsForInsert { Name = "1" };
             var result = _fixture.Db.SetEntity<RecordsForInsert>().Insert(insertRecord1);
             Assert.True(result);
             Assert.True(insertRecord1.Id == 1);
 
-            var insertRecord2 = new RecordsForInsert {Name = "2"};
+            var insertRecord2 = new RecordsForInsert { Name = "2" };
             result = _fixture.Db.SetEntity<RecordsForInsert>().Insert(insertRecord2);
             Assert.True(result);
             Assert.True(insertRecord2.Id == 2);
@@ -84,7 +84,7 @@ namespace Dapper.Extensions.Repository.Tests
         [Fact]
         public async Task TestDeleteAsync()
         {
-            var result = await _fixture.Db.SetEntity<RecordsForDelete>().DeleteAsync(new RecordsForDelete {Id = 1});
+            var result = await _fixture.Db.SetEntity<RecordsForDelete>().DeleteAsync(new RecordsForDelete { Id = 1 });
             Assert.True(result);
 
             var record = await _fixture.Db.SetEntity<RecordsForDelete>().FindAsync(p => p.Id == 1);
@@ -160,6 +160,71 @@ namespace Dapper.Extensions.Repository.Tests
         #region Mulitple Mapping Test
 
         [Fact]
+        public void TestFindMultipleMapping()
+        {
+            var sql = @"SELECT * FROM Users
+                        LEFT JOIN Cars ON Users.Id = Cars.UserId
+                        LEFT JOIN Images On Users.Id = Images.UserId
+                        WHERE Users.Deleted != 1";
+
+            var users = _fixture.Db.SetEntity<User>().FindAll<Car, Image>(sql).ToList();
+            Assert.Equal(3, users.Count);
+            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal("Car1", users[0].Cars[0].CarName);
+            Assert.Null(users[1].Cars);
+            Assert.NotNull(users[0].Image);
+            Assert.Equal("Image1", users[0].Image.Name);
+            Assert.Null(users[1].Image);
+            Assert.NotNull(users[2].Image);
+            Assert.Equal("Image4", users[2].Image.Name);
+        }
+
+        [Fact]
+        public void TestFindMultipleMapping1()
+        {
+            var sql = @"SELECT * FROM Users
+                    LEFT JOIN Cars ON Users.Id = Cars.UserId
+                    LEFT JOIN CarOptions ON Cars.Id = CarOptions.CarId
+                    LEFT JOIN Images On Users.Id = Images.UserId
+                    LEFT JOIN CarOptionImages ON CarOptions.Id = CarOptionImages.CarOptionId
+                    WHERE Users.Deleted != 1";
+
+            var users = _fixture.Db.SetEntity<User>().FindAll<Car, CarOption, Image, CarOptionImage>(sql).ToList();
+            Assert.Equal(3, users.Count);
+            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal("Car1", users[0].Cars[0].CarName);
+            Assert.Null(users[1].Cars);
+            Assert.NotNull(users[0].Image);
+            Assert.Equal("Image1", users[0].Image.Name);
+            Assert.Null(users[1].Image);
+            Assert.NotNull(users[2].Image);
+            Assert.Equal("Image4", users[2].Image.Name);
+            Assert.Equal(1, users[0].Cars[0].Options.Count);
+            Assert.Equal(2, users[0].Cars[1].Options.Count);
+            Assert.Equal("Option3", users[0].Cars[1].Options[1].OptionName);
+            Assert.Null(users[0].Cars[0].Options[0].Image);
+            Assert.Null(users[0].Cars[1].Options[0].Image);
+            Assert.NotNull(users[0].Cars[1].Options[1].Image);
+        }
+
+        [Fact]
+        public void TestFindMultipleMappingForSpiltOn()
+        {
+            var sql = @"SELECT * FROM Dishes
+                        LEFT JOIN DishOptions ON Dishes.DishId = DishOptions.DishId
+                        LEFT JOIN DishImages ON Dishes.DishId = DishImages.DishId";
+            var dishes = _fixture.Db.SetEntity<Dish>().FindAll<DishOption, DishImage>(sql).ToList();
+            Assert.Equal(dishes.Count, 3);
+            Assert.Equal(dishes[0].DishImages.Count, 1);
+            Assert.Equal(dishes[0].DishOptions.Count, 2);
+            Assert.Equal(dishes[0].DishOptions[0].Option, "DishOption1");
+            Assert.Equal(dishes[1].DishImages.Count, 1);
+            Assert.Null(dishes[1].DishOptions);
+            Assert.Equal(dishes[2].DishImages.Count, 2);
+            Assert.Equal(dishes[2].DishOptions.Count, 1);
+        }
+
+        [Fact]
         public async Task TestFindMultipleMappingAsync()
         {
             var sql = @"SELECT * FROM Users
@@ -205,6 +270,23 @@ namespace Dapper.Extensions.Repository.Tests
             Assert.Null(users[0].Cars[0].Options[0].Image);
             Assert.Null(users[0].Cars[1].Options[0].Image);
             Assert.NotNull(users[0].Cars[1].Options[1].Image);
+        }
+
+        [Fact]
+        public async Task TestFindMultipleMappingAsyncForSpiltOn()
+        {
+            var sql = @"SELECT * FROM Dishes
+                        LEFT JOIN DishOptions ON Dishes.DishId = DishOptions.DishId
+                        LEFT JOIN DishImages ON Dishes.DishId = DishImages.DishId";
+            var dishes = (await _fixture.Db.SetEntity<Dish>().FindAllAsync<DishOption, DishImage>(sql)).ToList();
+            Assert.Equal(dishes.Count, 3);
+            Assert.Equal(dishes[0].DishImages.Count, 1);
+            Assert.Equal(dishes[0].DishOptions.Count, 2);
+            Assert.Equal(dishes[0].DishOptions[0].Option, "DishOption1");
+            Assert.Equal(dishes[1].DishImages.Count, 1);
+            Assert.Null(dishes[1].DishOptions);
+            Assert.Equal(dishes[2].DishImages.Count, 2);
+            Assert.Equal(dishes[2].DishOptions.Count, 1);
         }
 
         #endregion

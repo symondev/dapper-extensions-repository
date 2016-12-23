@@ -55,7 +55,17 @@ namespace Dapper.Extensions.Repository
 
         #region Find Multiple Mapping
 
-        #endregion
+        IEnumerable<TEntity> FindAll<TChild1>(string sql, object param = null, IDbTransaction transaction = null);
+
+        IEnumerable<TEntity> FindAll<TChild1, TChild2>(string sql, object param = null, IDbTransaction transaction = null);
+
+        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3>(string sql, object param = null, IDbTransaction transaction = null);
+
+        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4>(string sql, object param = null, IDbTransaction transaction = null);
+
+        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(string sql, object param = null, IDbTransaction transaction = null);
+
+        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(string sql, object param = null, IDbTransaction transaction = null);
 
         Task<IEnumerable<TEntity>> FindAllAsync<TChild1>(string sql, object param = null, IDbTransaction transaction = null);
 
@@ -68,6 +78,8 @@ namespace Dapper.Extensions.Repository
         Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(string sql, object param = null, IDbTransaction transaction = null);
 
         Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(string sql, object param = null, IDbTransaction transaction = null);
+
+        #endregion
 
         #region Count
 

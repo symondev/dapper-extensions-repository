@@ -1,5 +1,19 @@
 ﻿{
-  "version": "1.0.0-*",
+  "version": "1.0.0",
+  "authors": [ "Symon Zhao" ],
+  "description": "Dapper.Extensions.Repository is an extensions to intergration with dapper-dot-net and MicroOrm.Dapper.Repositories.",
+  "title": "Dapper.Extensions.Repository",
+  "copyright": "2016 © Symon Zhao",
+  "packOptions": {
+    "owners": [ "Symon Zhao" ],
+    "licenseUrl": "https://opensource.org/licenses/MIT",
+    "projectUrl": "https://github.com/symondev/dapper-extensions-repository",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/symondev/dapper-extensions-repository"
+    },
+    "tags": [ "dapper", "repository" ]
+  },
 
   "dependencies": {
     "Dapper": "1.50.2",
