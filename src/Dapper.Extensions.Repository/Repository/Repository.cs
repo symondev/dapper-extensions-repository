@@ -100,7 +100,7 @@ namespace Dapper.Extensions.Repository
         {
             var queryResult = SqlGenerator.GetSelectAll(predicate);
 
-            return FindAllAsync<IEnumerable<TEntity>>(queryResult.Sql, queryResult.Param, transaction);
+            return FindAllAsync(queryResult.Sql, queryResult.Param, transaction);
         }
 
         public virtual async Task<IEnumerable<TEntity>> FindAllAsync(string sql, object param = null, IDbTransaction transaction = null)
