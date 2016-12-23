@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Dapper.Extensions.Repository.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Dapper.Extensions.Repository.Context
@@ -52,6 +53,7 @@ namespace Dapper.Extensions.Repository.Context
         {
             if (InnerConnection.State != ConnectionState.Open && InnerConnection.State != ConnectionState.Connecting)
             {
+                Logger.LogDbContext($"Open connection {InnerConnection.ConnectionString}.");
                 InnerConnection.Open();
             }
         }
@@ -61,6 +63,8 @@ namespace Dapper.Extensions.Repository.Context
         /// </summary>
         public virtual IDbTransaction BeginTransaction()
         {
+            Logger.LogDbContext("Begin transaction.");
+
             return Connection.BeginTransaction();
         }
 
@@ -79,11 +83,14 @@ namespace Dapper.Extensions.Repository.Context
             }
             else
             {
+                Logger.LogDbContext($"Add new repository {typeof(TEntity).FullName} and into DbContext.");
+
                 var repository = RepositoryFactory == null
                     ? new Repository<TEntity>(Connection, Logger)
                     : RepositoryFactory.CreateRepository<TEntity>(Connection);
 
                 Repositories.Add(type, repository);
+
                 return repository;
             }
         }
@@ -94,7 +101,11 @@ namespace Dapper.Extensions.Repository.Context
         public void Dispose()
         {
             if (InnerConnection != null && InnerConnection.State != ConnectionState.Closed)
+            {
+                Logger.LogDbContext($"Close connection.");
+
                 InnerConnection.Close();
+            }
         }
     }
 }

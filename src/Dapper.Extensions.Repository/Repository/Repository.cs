@@ -18,6 +18,7 @@ namespace Dapper.Extensions.Repository
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         #region Constructor
+
         public Repository(IDbConnection connection, ILogger logger = null)
         {
             Connection = connection;
@@ -77,6 +78,9 @@ namespace Dapper.Extensions.Repository
         public virtual IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectAll(predicate);
+
+            Logger.LogSql(queryResult.Sql);
+
             return Connection.Query<TEntity>(queryResult.Sql, queryResult.Param, transaction);
         }
 
@@ -86,6 +90,8 @@ namespace Dapper.Extensions.Repository
         public virtual async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectAll(predicate);
+
+            Logger.LogSql(queryResult.Sql);
 
             return await Connection.QueryAsync<TEntity>(queryResult.Sql, queryResult.Param, transaction);
         }

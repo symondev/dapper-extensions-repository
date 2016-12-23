@@ -5,6 +5,11 @@ namespace Dapper.Extensions.Repository.Extensions
 {
     internal static class LoggerExtensions
     {
+        public static void LogDbContext(this ILogger logger, string message)
+        {
+            logger?.LogInformation(message);
+        }
+
         public static void LogSql(this ILogger logger, string sql, object param = null)
         {
             if (logger != null)
@@ -12,7 +17,7 @@ namespace Dapper.Extensions.Repository.Extensions
                 var message = $"Execute sql: {sql}";
                 if (param != null)
                 {
-                    message += $", {JsonConvert.SerializeObject(param)}";
+                    message += $", {JsonConvert.SerializeObject(param)}.";
                 }
 
                 logger.LogInformation(message);
