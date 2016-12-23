@@ -17,7 +17,7 @@ namespace Dapper.Extensions.Repository.Context
             Logger = logger;
         }
         
-        public DbContext(IDbConnection connection, IRepositoryFactory repositoryFactory) : this(connection)
+        public DbContext(IDbConnection connection, IRepositoryFactory repositoryFactory, ILogger logger = null) : this(connection, logger)
         {
             RepositoryFactory = repositoryFactory;
         }

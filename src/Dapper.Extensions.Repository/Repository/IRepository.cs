@@ -49,7 +49,7 @@ namespace Dapper.Extensions.Repository
         /// <summary>
         ///
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+        Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null);
 
         #endregion
 
