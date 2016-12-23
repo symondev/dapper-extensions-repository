@@ -11,5 +11,7 @@ namespace Dapper.Extensions.Repository.Tests.Entities
         public string CarName { get; set; }
 
         public IList<CarOption> Options { get; set; }
+
+        public IList<CarAddOn> AddOns { get; set; }
     }
 }

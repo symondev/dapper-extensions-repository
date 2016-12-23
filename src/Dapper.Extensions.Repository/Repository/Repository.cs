@@ -348,6 +348,7 @@ namespace Dapper.Extensions.Repository
                 var child = childs[i];
                 if (child == null)
                 {
+                    tagretChilds.Add(null);
                     continue;
                 }
 

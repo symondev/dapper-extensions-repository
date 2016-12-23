@@ -169,7 +169,7 @@ namespace Dapper.Extensions.Repository.Tests
 
             var users = _fixture.Db.SetEntity<User>().FindAll<Car, Image>(sql).ToList();
             Assert.Equal(3, users.Count);
-            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal(3, users[0].Cars.Count);
             Assert.Equal("Car1", users[0].Cars[0].CarName);
             Assert.Null(users[1].Cars);
             Assert.NotNull(users[0].Image);
@@ -184,14 +184,16 @@ namespace Dapper.Extensions.Repository.Tests
         {
             var sql = @"SELECT * FROM Users
                     LEFT JOIN Cars ON Users.Id = Cars.UserId
+                    LEFT JOIN CarAddOns ON Cars.Id = CarAddOns.CarId
                     LEFT JOIN CarOptions ON Cars.Id = CarOptions.CarId
                     LEFT JOIN Images On Users.Id = Images.UserId
                     LEFT JOIN CarOptionImages ON CarOptions.Id = CarOptionImages.CarOptionId
+                    LEFT JOIN Roles ON Users.Id = Roles.UserId
                     WHERE Users.Deleted != 1";
 
-            var users = _fixture.Db.SetEntity<User>().FindAll<Car, CarOption, Image, CarOptionImage>(sql).ToList();
+            var users = _fixture.Db.SetEntity<User>().FindAll<Car, CarAddOn, CarOption, Image, CarOptionImage, Role>(sql).ToList();
             Assert.Equal(3, users.Count);
-            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal(3, users[0].Cars.Count);
             Assert.Equal("Car1", users[0].Cars[0].CarName);
             Assert.Null(users[1].Cars);
             Assert.NotNull(users[0].Image);
@@ -201,10 +203,10 @@ namespace Dapper.Extensions.Repository.Tests
             Assert.Equal("Image4", users[2].Image.Name);
             Assert.Equal(1, users[0].Cars[0].Options.Count);
             Assert.Equal(2, users[0].Cars[1].Options.Count);
-            Assert.Equal("Option3", users[0].Cars[1].Options[1].OptionName);
-            Assert.Null(users[0].Cars[0].Options[0].Image);
-            Assert.Null(users[0].Cars[1].Options[0].Image);
-            Assert.NotNull(users[0].Cars[1].Options[1].Image);
+            Assert.Equal("CarOption3", users[0].Cars[1].Options[1].OptionName);
+            Assert.NotNull(users[0].Cars[0].Options[0].Image);
+            Assert.Equal("CarOptionImage3", users[0].Cars[0].Options[0].Image.Name);
+            Assert.Null(users[0].Cars[1].Options[1].Image);
         }
 
         [Fact]
@@ -234,7 +236,7 @@ namespace Dapper.Extensions.Repository.Tests
 
             var users = (await _fixture.Db.SetEntity<User>().FindAllAsync<Car, Image>(sql)).ToList();
             Assert.Equal(3, users.Count);
-            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal(3, users[0].Cars.Count);
             Assert.Equal("Car1", users[0].Cars[0].CarName);
             Assert.Null(users[1].Cars);
             Assert.NotNull(users[0].Image);
@@ -249,14 +251,16 @@ namespace Dapper.Extensions.Repository.Tests
         {
             var sql = @"SELECT * FROM Users
                     LEFT JOIN Cars ON Users.Id = Cars.UserId
+                    LEFT JOIN CarAddOns ON Cars.Id = CarAddOns.CarId
                     LEFT JOIN CarOptions ON Cars.Id = CarOptions.CarId
                     LEFT JOIN Images On Users.Id = Images.UserId
                     LEFT JOIN CarOptionImages ON CarOptions.Id = CarOptionImages.CarOptionId
+                    LEFT JOIN Roles ON Users.Id = Roles.UserId
                     WHERE Users.Deleted != 1";
 
-            var users = (await _fixture.Db.SetEntity<User>().FindAllAsync<Car, CarOption, Image, CarOptionImage>(sql)).ToList();
+            var users = (await _fixture.Db.SetEntity<User>().FindAllAsync<Car, CarAddOn, CarOption, Image, CarOptionImage, Role>(sql)).ToList();
             Assert.Equal(3, users.Count);
-            Assert.Equal(2, users[0].Cars.Count);
+            Assert.Equal(3, users[0].Cars.Count);
             Assert.Equal("Car1", users[0].Cars[0].CarName);
             Assert.Null(users[1].Cars);
             Assert.NotNull(users[0].Image);
@@ -266,10 +270,10 @@ namespace Dapper.Extensions.Repository.Tests
             Assert.Equal("Image4", users[2].Image.Name);
             Assert.Equal(1, users[0].Cars[0].Options.Count);
             Assert.Equal(2, users[0].Cars[1].Options.Count);
-            Assert.Equal("Option3", users[0].Cars[1].Options[1].OptionName);
-            Assert.Null(users[0].Cars[0].Options[0].Image);
-            Assert.Null(users[0].Cars[1].Options[0].Image);
-            Assert.NotNull(users[0].Cars[1].Options[1].Image);
+            Assert.Equal("CarOption3", users[0].Cars[1].Options[1].OptionName);
+            Assert.NotNull(users[0].Cars[0].Options[0].Image);
+            Assert.Equal("CarOptionImage3", users[0].Cars[0].Options[0].Image.Name);
+            Assert.Null(users[0].Cars[1].Options[1].Image);
         }
 
         [Fact]
