@@ -53,7 +53,7 @@ namespace Dapper.Extensions.Repository.Context
         {
             if (InnerConnection.State != ConnectionState.Open && InnerConnection.State != ConnectionState.Connecting)
             {
-                Logger.LogDbContext($"Open connection {InnerConnection.ConnectionString}.");
+                Logger.LogDbContext("Open connection.");
                 InnerConnection.Open();
             }
         }
@@ -87,7 +87,7 @@ namespace Dapper.Extensions.Repository.Context
 
                 var repository = RepositoryFactory == null
                     ? new Repository<TEntity>(Connection, Logger)
-                    : RepositoryFactory.CreateRepository<TEntity>(Connection);
+                    : RepositoryFactory.CreateRepository<TEntity>(Connection, Logger);
 
                 Repositories.Add(type, repository);
 

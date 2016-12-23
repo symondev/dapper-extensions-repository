@@ -35,21 +35,23 @@ namespace Dapper.Extensions.Repository
 
         TEntity Find(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
 
+        TEntity Find(string sql, object param = null, IDbTransaction transaction = null);
+
         Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+
+        Task<TEntity> FindAsync(string sql, object param = null, IDbTransaction transaction = null);
 
         #endregion
 
         #region Find All
-
-        /// <summary>
-        ///
-        /// </summary>
+        
         IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null);
 
-        /// <summary>
-        ///
-        /// </summary>
+        IEnumerable<TEntity> FindAll(string sql, object param = null, IDbTransaction transaction = null);
+        
         Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null);
+
+        Task<IEnumerable<TEntity>> FindAllAsync(string sql, object param = null, IDbTransaction transaction = null);
 
         #endregion
 
@@ -136,6 +138,26 @@ namespace Dapper.Extensions.Repository
         ///
         /// </summary>
         Task<bool> UpdateAsync(TEntity instance, IDbTransaction transaction = null);
+
+        #endregion
+
+        #region Execute
+
+        int Execute(string sql, object param = null, IDbTransaction transaction = null);
+
+        Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null);
+
+        IDataReader ExecuteReader(string sql, object param = null, IDbTransaction transaction = null);
+
+        Task<IDataReader> ExecuteReaderAsync(string sql, object param = null, IDbTransaction transaction = null);
+
+        object ExecuteScalar(string sql, object param = null, IDbTransaction transaction = null);
+
+        Task<object> ExecuteScalarAsync(string sql, object param = null, IDbTransaction transaction = null);
+
+        T ExecuteScalar<T>(string sql, object param = null, IDbTransaction transaction = null);
+
+        Task<T> ExecuteScalarAsync<T>(string sql, object param = null, IDbTransaction transaction = null);
 
         #endregion
     }

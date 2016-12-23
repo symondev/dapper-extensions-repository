@@ -54,46 +54,60 @@ namespace Dapper.Extensions.Repository
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate);
 
-            Logger.LogSql(queryResult.Sql, queryResult.Param);
-
-            return Connection.QueryFirstOrDefault<TEntity>(queryResult.Sql, queryResult.Param, transaction);
+            return Find(queryResult.Sql, queryResult.Param, transaction);
         }
 
-        public virtual async Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
+        public virtual TEntity Find(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.QueryFirstOrDefault<TEntity>(sql, param, transaction);
+        }
+
+        public virtual Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate);
 
-            Logger.LogSql(queryResult.Sql, queryResult.Param);
+            return FindAsync(queryResult.Sql, queryResult.Param, transaction);
+        }
 
-            return await Connection.QueryFirstOrDefaultAsync<TEntity>(queryResult.Sql, queryResult.Param, transaction);
+        public virtual async Task<TEntity> FindAsync(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return await Connection.QueryFirstOrDefaultAsync<TEntity>(sql, param, transaction);
         }
 
         #endregion Find
 
         #region FindAll
-
-        /// <summary>
-        ///
-        /// </summary>
+        
         public virtual IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectAll(predicate);
 
-            Logger.LogSql(queryResult.Sql);
-
-            return Connection.Query<TEntity>(queryResult.Sql, queryResult.Param, transaction);
+            return FindAll(queryResult.Sql, queryResult.Param);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public virtual async Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
+        public virtual IEnumerable<TEntity> FindAll(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.Query<TEntity>(sql, param, transaction);
+        }
+        
+        public virtual Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate = null, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectAll(predicate);
 
-            Logger.LogSql(queryResult.Sql);
+            return FindAllAsync<IEnumerable<TEntity>>(queryResult.Sql, queryResult.Param, transaction);
+        }
 
-            return await Connection.QueryAsync<TEntity>(queryResult.Sql, queryResult.Param, transaction);
+        public virtual async Task<IEnumerable<TEntity>> FindAllAsync(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return await Connection.QueryAsync<TEntity>(sql, param, transaction);
         }
 
         #endregion FindAll
@@ -623,6 +637,66 @@ namespace Dapper.Extensions.Repository
         }
 
         #endregion Update
+
+        #region Execute
+
+        public int Execute(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.Execute(sql, param, transaction);
+        }
+
+        public Task<int> ExecuteAsync(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteAsync(sql, param, transaction);
+        }
+
+        public IDataReader ExecuteReader(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteReader(sql, param, transaction);
+        }
+
+        public Task<IDataReader> ExecuteReaderAsync(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteReaderAsync(sql, param, transaction);
+        }
+
+        public object ExecuteScalar(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteScalar(sql, param, transaction);
+        }
+
+        public Task<object> ExecuteScalarAsync(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteScalarAsync(sql, param, transaction);
+        }
+
+        public T ExecuteScalar<T>(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteScalar<T>(sql, param, transaction);
+        }
+
+        public Task<T> ExecuteScalarAsync<T>(string sql, object param = null, IDbTransaction transaction = null)
+        {
+            Logger.LogSql(sql, param);
+
+            return Connection.ExecuteScalarAsync<T>(sql, param, transaction);
+        }
+
+        #endregion
 
         /// <summary>
         /// Dummy type for excluding from multi-map
