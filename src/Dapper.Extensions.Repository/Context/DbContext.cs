@@ -87,7 +87,7 @@ namespace Dapper.Extensions.Repository.Context
 
                 var repository = RepositoryFactory == null
                     ? new Repository<TEntity>(Connection, Logger)
-                    : RepositoryFactory.CreateRepository<TEntity>(Connection, Logger);
+                    : RepositoryFactory.CreateRepository<TEntity>();
 
                 Repositories.Add(type, repository);
 
