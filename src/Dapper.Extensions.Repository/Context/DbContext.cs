@@ -16,6 +16,8 @@ namespace Dapper.Extensions.Repository.Context
             InnerConnection = connection;
             Repositories = new Dictionary<Type, IRepository>();
             Logger = logger;
+
+            Logger.LogDbContext("Build new DbContext.");
         }
         
         public DbContext(IDbConnection connection, IRepositoryFactory repositoryFactory, ILogger logger = null) : this(connection, logger)
@@ -106,6 +108,8 @@ namespace Dapper.Extensions.Repository.Context
 
                 InnerConnection.Close();
             }
+
+            Logger.LogDbContext("Dispose DbContext.");
         }
     }
 }

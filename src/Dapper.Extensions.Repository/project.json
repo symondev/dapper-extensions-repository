@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.2.3",
+  "version": "1.2.4",
   "authors": [ "Symon Zhao" ],
   "description": "Dapper.Extensions.Repository is an extensions to intergration with dapper-dot-net and MicroOrm.Dapper.Repositories.",
   "title": "Dapper.Extensions.Repository",

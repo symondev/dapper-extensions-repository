@@ -1,11 +1,12 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace Dapper.Extensions.Repository.Context
 {
     /// <summary>
     /// DbContext interface
     /// </summary>
-    public interface IDbContext
+    public interface IDbContext : IDisposable
     {
         IDbConnection Connection { get; }
 

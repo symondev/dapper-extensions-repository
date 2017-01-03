@@ -7,7 +7,7 @@ namespace Dapper.Extensions.Repository.Extensions
     {
         public static void LogDbContext(this ILogger logger, string message)
         {
-            logger?.LogInformation(message);
+            logger?.LogDebug(message);
         }
 
         public static void LogSql(this ILogger logger, string sql, object param = null)
