@@ -1,7 +1,10 @@
-﻿namespace Dapper.Extensions.Repository
+﻿using System.Data;
+using Microsoft.Extensions.Logging;
+
+namespace Dapper.Extensions.Repository
 {
     public interface IRepositoryFactory
     {
-        IRepository<TEntity> CreateRepository<TEntity>() where TEntity : class;
+        IRepository<TEntity> CreateRepository<TEntity>(IDbConnection connection, ILogger logger) where TEntity : class;
     }
 }
