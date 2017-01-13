@@ -17,7 +17,7 @@ namespace Dapper.Extensions.Repository.Context
             Repositories = new Dictionary<Type, IRepository>();
             Logger = logger;
 
-            Logger.LogDbContext("Build new DbContext.");
+            Logger?.LogInformation("Started new IDbContext.");
         }
         
         public DbContext(IDbConnection connection, IRepositoryFactory repositoryFactory, ILogger logger = null) : this(connection, logger)
@@ -55,8 +55,9 @@ namespace Dapper.Extensions.Repository.Context
         {
             if (InnerConnection.State != ConnectionState.Open && InnerConnection.State != ConnectionState.Connecting)
             {
-                Logger.LogDbContext("Open connection.");
                 InnerConnection.Open();
+
+                Logger?.LogInformation("Opened sql connection.");
             }
         }
 
@@ -65,9 +66,11 @@ namespace Dapper.Extensions.Repository.Context
         /// </summary>
         public virtual IDbTransaction BeginTransaction()
         {
-            Logger.LogDbContext("Begin transaction.");
+            var tran = Connection.BeginTransaction();
 
-            return Connection.BeginTransaction();
+            Logger?.LogInformation("Began transaction.");
+
+            return tran;
         }
 
         /// <summary>
@@ -85,13 +88,13 @@ namespace Dapper.Extensions.Repository.Context
             }
             else
             {
-                Logger.LogDbContext($"Add new repository {typeof(TEntity).FullName} and into DbContext.");
-
                 var repository = RepositoryFactory == null
                     ? new Repository<TEntity>(Connection, Logger)
                     : RepositoryFactory.CreateRepository<TEntity>(Connection, Logger);
 
                 Repositories.Add(type, repository);
+
+                Logger?.LogInformation($"Added new repository {typeof(TEntity).FullName} and into DbContext.");
 
                 return repository;
             }
@@ -104,12 +107,12 @@ namespace Dapper.Extensions.Repository.Context
         {
             if (InnerConnection != null && InnerConnection.State != ConnectionState.Closed)
             {
-                Logger.LogDbContext($"Close connection.");
-
                 InnerConnection.Close();
+
+                Logger?.LogInformation("Closed sql connection.");
             }
 
-            Logger.LogDbContext("Dispose DbContext.");
+            Logger?.LogInformation("DbContext finished.");
         }
     }
 }
