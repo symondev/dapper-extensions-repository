@@ -10,6 +10,10 @@ namespace Dapper.Extensions.Repository.Context
     {
         IDbConnection Connection { get; }
 
+        void OpenConnection();
+
+        IDbTransaction BeginTransaction();
+
         /// <summary>
         /// Get repository by type of entity
         /// </summary>
